@@ -60,7 +60,7 @@ pipeline {
 	    
 	    
 
-        stage('test') {
+     /*   stage('test') {
 
             steps {
 
@@ -84,7 +84,22 @@ pipeline {
 
             }
 
-        }
+        }*/
+	    
+	    
+	         stage('test') {
+            steps {
+                sh '''
+                    cp app/.env.example app/.env
+                    docker-compose kill -s SIGINT
+                    docker-compose up -d --build
+                    while ! docker-compose exec fastapi wget -S --spider http://localhost:8000/docs ; do sleep 1; done
+                    docker-compose exec fastapi pytest
+                    docker-compose down --volumes
+                '''
+            }
+        }   
+	    
 
     }
 
